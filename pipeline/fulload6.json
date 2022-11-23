@@ -1,0 +1,345 @@
+{
+	"name": "fulload6",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select top 3 Table_name from INFORMATION_SCHEMA.tables where table_schema='dbo'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "sql_practcal",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "sql_p_s",
+									"type": "DatasetReference",
+									"parameters": {
+										"Table_name": {
+											"value": "@item().Table_name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "taskpaste",
+									"type": "DatasetReference",
+									"parameters": {
+										"tbname": {
+											"value": "@item().Table_name",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "load_compelete",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[tablelog]",
+								"storedProcedureParameters": {
+									"datafactoryname": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"modifieddate": {
+										"value": {
+											"value": "@utcNow()",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pipelineid": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipelinename": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"status": {
+										"value": "success",
+										"type": "String"
+									},
+									"tablename": {
+										"value": {
+											"value": "@item().Table_name",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"triggerid": {
+										"value": {
+											"value": "@pipeline().TriggerId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"triggername": {
+										"value": {
+											"value": "@pipeline().TriggerName",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "SqlServer1",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"database": "task"
+								}
+							}
+						},
+						{
+							"name": "failog",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy data1",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "SqlServer1",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"database": "task"
+								}
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "tablename",
+												"type": "String",
+												"value": {
+													"value": "@item().Table_name",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "datafactoryname",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().DataFactory",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "pipelinename",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "pipelineid",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "triggerid",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().TriggerId",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "triggername",
+												"type": "String",
+												"value": {
+													"value": "@pipeline().TriggerName",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "status",
+												"type": "String",
+												"value": "failure",
+												"direction": "Input"
+											},
+											{
+												"name": "modifieddate",
+												"type": "Datetime",
+												"value": {
+													"value": "@utcNow()",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "Query",
+										"text": {
+											"value": "insert into dbo.tablelogs \nvalues(@tablename,@datafactoryname,@pipelinename,\n@pipelineid,@triggerid,@triggername,@status,@modifieddate)",
+											"type": "Expression"
+										}
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						},
+						{
+							"name": "Fail2",
+							"type": "Fail",
+							"dependsOn": [
+								{
+									"activity": "failog",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "1200",
+								"errorCode": "please check your audit table"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Fail1",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "ForEach1",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"message": "'check yours pipeline'",
+					"errorCode": "0000000"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-11-16T09:46:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

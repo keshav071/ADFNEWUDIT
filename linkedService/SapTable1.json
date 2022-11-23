@@ -1,0 +1,21 @@
+{
+	"name": "SapTable1",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SapTable",
+		"typeProperties": {
+			"clientId": "100",
+			"language": "",
+			"sncMode": false,
+			"userName": "kjoshi",
+			"server": "fas.cognitusconsulting.com",
+			"systemNumber": "01",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIxZTNhNDRmNi01MGFhLTQ5NDYtYjQxOS1iY2RjNzc2MWUzZjAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "newir1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

@@ -1,0 +1,31 @@
+{
+	"name": "adv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adv",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sch": {
+				"type": "string"
+			},
+			"tab": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().sch",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().tab",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

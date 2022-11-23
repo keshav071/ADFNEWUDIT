@@ -1,0 +1,17 @@
+{
+	"name": "source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adv",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "stg",
+			"table": "Currency"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

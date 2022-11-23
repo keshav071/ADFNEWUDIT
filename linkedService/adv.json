@@ -1,0 +1,17 @@
+{
+	"name": "adv",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=True;data source=MSI\\SQLEXPRESS;initial catalog=AdventureWorks2019",
+			"userName": "MSI\\kesha",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiIxYWY4Zjk3Ni1hY2Q5LTQ1NGQtOWM1Yy00MjY1YmFiYWUwNzEiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "newir1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

@@ -1,0 +1,107 @@
+{
+	"name": "pipeline9",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET",
+							"requestTimeout": ""
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id"
+								}
+							},
+							{
+								"source": {
+									"path": "['employee_name']"
+								},
+								"sink": {
+									"name": "employee_name"
+								}
+							},
+							{
+								"source": {
+									"path": "['employee_salary']"
+								},
+								"sink": {
+									"name": "employee_salary"
+								}
+							},
+							{
+								"source": {
+									"path": "['employee_age']"
+								},
+								"sink": {
+									"name": "employee_age"
+								}
+							},
+							{
+								"source": {
+									"path": "['profile_image']"
+								},
+								"sink": {
+									"name": "profile_image"
+								}
+							}
+						],
+						"collectionReference": "$['data']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Json1",
+						"type": "DatasetReference",
+						"parameters": {
+							"url": "https://dummy.restapiexample.com/api/v1/employees"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SqlServerTable3",
+						"type": "DatasetReference",
+						"parameters": {
+							"nametb": "dcsv1"
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-11-03T11:05:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,24 @@
+{
+	"name": "SapTableResource1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SapTable1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tablen": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SapTableResource",
+		"schema": [],
+		"typeProperties": {
+			"tableName": {
+				"value": "@dataset().tablen",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

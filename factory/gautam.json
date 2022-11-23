@@ -1,0 +1,9 @@
+{
+	"name": "gautam",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "cafbdc32-c807-467f-b6e3-e635a7048e72",
+		"tenantId": "e494068c-f03c-4dbf-ae26-1f67f7c32ea5"
+	}
+}
