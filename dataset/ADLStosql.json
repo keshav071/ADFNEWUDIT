@@ -17,8 +17,11 @@
 		"type": "SqlServerTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": ".",
-			"table": "."
+			"schema": "dbo1",
+			"table": {
+				"value": "@dataset().sqlpname",
+				"type": "Expression"
+			}
 		}
 	}
 }

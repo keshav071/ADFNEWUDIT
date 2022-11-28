@@ -60,6 +60,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "SapTableSource",
+									"rowCount": 0,
 									"rfcTableOptions": {
 										"value": "@{item().condition}",
 										"type": "Expression"
