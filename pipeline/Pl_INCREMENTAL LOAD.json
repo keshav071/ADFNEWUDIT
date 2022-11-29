@@ -1,0 +1,167 @@
+{
+	"name": "Pl_INCREMENTAL LOAD",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lk_LOADTYPE",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"sqlReaderQuery": "select * from ETL.SAPLOOKUP where loadtype='Delta'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Ds_LOADTYPE",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Fe_itratelookup",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lk_LOADTYPE",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lk_LOADTYPE').output.value",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "CP_SAPTOSQLSTG",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SapTableSource",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"preCopyScript": {
+										"value": "@{concat('if EXISTS(SELECT table_schema,table_name FROM \nINFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=','''',\nitem().stagingschema,'''','AND TABLE_NAME=','''',\nitem().tablename,'''',') begin ',\n'truncate table ',item().stagingschema,'.',item().Tablename\n,' end'\n)}\n",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SapTableResource1",
+									"type": "DatasetReference",
+									"parameters": {
+										"tablen": {
+											"value": "@item().tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_SAPTOSQL",
+									"type": "DatasetReference",
+									"parameters": {
+										"shcema": {
+											"value": "@item().stagingschema",
+											"type": "Expression"
+										},
+										"tablename": {
+											"value": "@item().Tablename",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "SP_LOADTABLESTAGINGTODBOANDUPDATELOOKUP",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CP_SAPTOSQLSTG",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[sp_update]",
+								"storedProcedureParameters": {
+									"pipelinetime": {
+										"value": {
+											"value": "@pipeline().TriggerTime",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"tablename": {
+										"value": {
+											"value": "@item().Tablename",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "SqlServer1",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"database": "sap"
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}
