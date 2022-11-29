@@ -1,5 +1,5 @@
 {
-	"name": "Pl_LOAD SAP TO SQL",
+	"name": "Pl_FULL LOAD SAP TO SQL",
 	"properties": {
 		"activities": [
 			{
@@ -61,6 +61,11 @@
 							"typeProperties": {
 								"source": {
 									"type": "SapTableSource",
+									"rfcTableOptions": {
+										"value": "@{item().delatcondition}",
+										"type": "Expression"
+									},
+									"customRfcReadTableFunctionModule": "",
 									"partitionOption": "None"
 								},
 								"sink": {
