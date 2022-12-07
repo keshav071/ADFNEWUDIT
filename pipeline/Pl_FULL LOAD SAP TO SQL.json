@@ -240,7 +240,7 @@
 									},
 									"pipelineTriggerTime": {
 										"value": {
-											"value": "@pipeline().TriggerTime",
+											"value": "@pipeline().parameters.Fullloadtime",
 											"type": "Expression"
 										},
 										"type": "DateTime"
@@ -317,11 +317,143 @@
 									"database": "SAP"
 								}
 							}
+						},
+						{
+							"name": "SP_AuditLog_copy1",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CP_SAPTOSQLSTG",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[Sp_AuditLog]",
+								"storedProcedureParameters": {
+									"ExecutionFlag": {
+										"value": null,
+										"type": "Int32"
+									},
+									"Message": {
+										"value": {
+											"value": "@if(equals(activity('CP_SAPTOSQLSTG').output.executionDetails[0].status,'Succeeded'),'Success',activity('CP_SAPTOSQLSTG').output.error[0].message )",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipeLineRunId": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pipelineTriggerTime": {
+										"value": {
+											"value": "@pipeline().parameters.Fullloadtime",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"RowsCopy": {
+										"value": {
+											"value": "@activity('CP_SAPTOSQLSTG').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"Rowsread": {
+										"value": {
+											"value": "@activity('CP_SAPTOSQLSTG').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"SinkSchema": {
+										"value": {
+											"value": "@item().finalschema",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SinkTable": {
+										"value": {
+											"value": "@item().FinalTableName",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SinkType": {
+										"value": {
+											"value": "@activity('CP_SAPTOSQLSTG').output.executionDetails[0].source.type",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SourceTable": {
+										"value": {
+											"value": "@item().Tablename",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SourceType": {
+										"value": {
+											"value": "@activity('CP_SAPTOSQLSTG').output.executionDetails[0].source.type",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"StartTime": {
+										"value": {
+											"value": "@activity('CP_SAPTOSQLSTG').output.executionDetails[0].start",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"Status": {
+										"value": {
+											"value": "@activity('CP_SAPTOSQLSTG').output.executionDetails[0].status",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "SqlServer1",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"database": "SAP"
+								}
+							}
 						}
 					]
 				}
 			}
 		],
+		"parameters": {
+			"Fullloadtime": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }

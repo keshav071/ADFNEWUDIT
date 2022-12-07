@@ -166,7 +166,7 @@
 									},
 									"pipelineTriggerTime": {
 										"value": {
-											"value": "@pipeline().TriggerTime",
+											"value": "@pipeline().parameters.DeltaLoadtime",
 											"type": "Expression"
 										},
 										"type": "DateTime"
@@ -355,7 +355,7 @@
 									},
 									"pipelineTriggerTime": {
 										"value": {
-											"value": "@pipeline().TriggerTime",
+											"value": "@pipeline().parameters.DeltaLoadtime",
 											"type": "Expression"
 										},
 										"type": "DateTime"
@@ -437,9 +437,9 @@
 				}
 			}
 		],
-		"variables": {
-			"xvy": {
-				"type": "Array"
+		"parameters": {
+			"DeltaLoadtime": {
+				"type": "string"
 			}
 		},
 		"annotations": []
